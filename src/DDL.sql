@@ -1,66 +1,81 @@
+create table user_account (
+account_number numeric(5,0) not null,
+name varchar(30),
+primary key (account_number)
+);
+
 create table Login_Information (
 username varchar(30),
 password varchar(30),
+account_number numeric(5,0) not null,
 primary key (username),
-foreign key (account_number) references account(account_number)
-)
-
-create table Account (
-account_number numeric not null auto_increment,
-name varchar(30),
-primary key (account_number),
-foreign key (username) references login_information(username),
-foreign key (order_number) references order(order_number)
-)
+foreign key (account_number) references user_account(account_number)
+);
 
 create table Address (
+address_id numeric(5,0),
 state varchar(30),
 city varchar(30),
 street varchar(50),
 zip_code numeric(5,0),
-primary key (account_number) references account(account_number) on delete cascade
-)
+account_number numeric(5,0) not null,
+primary key (address_id),
+foreign key (account_number) references user_account(account_number) on delete cascade
+);
 
 create table Payment_Method (
+payment_id numeric (5,0),
 name varchar(30),
 type varchar(20),
 information varchar(50),
-primary key (account_number) references account(account_number) on delete cascade
-)
+account_number numeric(5,0) not null,
+primary key (payment_id),
+foreign key (account_number) references user_account(account_number) on delete cascade
+);
 
 create table Product (
-  product_ID numeric(5,0) not null,
+  Product_ID			varchar(8),
   name varchar(30),
-  quantity numeric(10,0),
-  primary key (product_ID),
-  foreign key (shelf_ID) references shelf(shelf_ID)
-)
+  Quantity	numeric(10,0),
+  Shelf_ID	varchar(8),
+  primary key (product_ID)
+);
 
-create table order (
-order_number numeric not null auto_increment,
-product_ID numeric(5,0) not null,
+create table customer_order (
+order_number numeric(5,0) not null,
+Product_ID			varchar(8),
 order_date varchar(30),
+account_number numeric(5,0) not null,
 primary key (order_number),
-foreign key (account_number) references account(account_number) on delete cascade,
+foreign key (account_number) references user_account(account_number) on delete cascade,
 foreign key (product_ID) references product(product_ID) on delete cascade
-)
+);
 
 create table delivery_method (
+  delivery_id numeric(5,0),
   type varchar(30),
-  primary key (order_number) references order(order_number) on delete cascade
-)
+  order_number numeric(5,0) not null,
+  primary key (delivery_id),
+  foreign key (order_number) references customer_order(order_number) on delete cascade
+);
 
 create table order_history(
-  primary key (account_number) references account(account_number) on delete cascade,
-  foreign key (order_number) references order(order_number)
-)
+  history_id numeric(5,0),
+  account_number numeric(5,0) not null,
+  order_number numeric(5,0) not null,
+  primary key(history_id),
+  foreign key (account_number) references user_account(account_number) on delete cascade,
+  foreign key (order_number) references customer_order(order_number)
+);
 
 create table Warehouse
     (Warehouse_num		numeric(25,0),
     Product_ID			varchar(8),
     Quantity			numeric(10,0),
 	primary key (Warehouse_num),
-    foreign key (Product_ID, Quantity) references Product (Product_ID, Quantity)
+    foreign key (Product_ID) references Product (Product_ID)
+    	on delete cascade,
+    foreign key (Quantity) references Product (Quantity)
     	on delete cascade
     );
 
