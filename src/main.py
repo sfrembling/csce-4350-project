@@ -1,74 +1,124 @@
-import mysql.connector as sql # for database
-import tkinter as tk          # for GUI
-import tkinter.ttk as ttk
-import tkinter.messagebox as msg
-import database as db
+from tkinter import *
+from tkinter.messagebox import showerror # import everything for GUI support
+import mysql.connector as sql
 
-# quit the program
-def quit(root: tk.Tk):
-    root.quit()
 
-# setup the root window
-def setup_root(title: str, size: int) -> tk.Tk:
-    root = tk.Tk()
-    root.title(title)
-    root.geometry(f"{size}x{size}")
-    root.resizable(False, False)
-    root.protocol("WM_DELETE_WINDOW", quit(root))
-    return root
+screen = Tk()    # screen where text is drawn
+connection: None # the active MySQL connection
+name: str        # the database name
+widgets = []     # maintains all the widgets
 
-def run(root: tk.Tk):
-    root.mainloop()
+# the entry point where the user logs into the SQL server using their info
+def login_screen():
+    global screen
+    global widgets
+    global name
+    screen.geometry("600x600")
+    screen.title("Login to MySQL Server")
 
-# Prompts the user for the database information and passes that info to "entry"
-def get_db_info(root: tk.Tk, entry: callable) -> db.DBInfo:
-    host = tk.StringVar()
-    user = tk.StringVar()
-    port = tk.StringVar()
-    passwd = tk.StringVar()
+    # holds the user's credentials
+    host = StringVar()
+    user = StringVar()
+    port = StringVar()
+    passwd = StringVar()
+    name = StringVar()
 
-    host_entry = ttk.Entry(root, textvariable=host)
-    user_entry = ttk.Entry(root, textvariable=user)
-    port_entry = ttk.Entry(root, textvariable=port)
-    passwd_entry = ttk.Entry(root, textvariable=passwd, show="*")
-    
-    host_entry.grid(row=0, column=1)
-    user_entry.grid(row=1, column=1)
-    port_entry.grid(row=2, column=1)
-    passwd_entry.grid(row=3, column=1)
+    # host label and entry
+    widgets.append(Label(screen, text="Host Address"))
+    widgets.append(Entry(screen, textvariable=host))
+    widgets[1].focus()
 
-    ttk.Label(root, text="Host").grid(row=0, column=0)
-    ttk.Label(root, text="User").grid(row=1, column=0)
-    ttk.Label(root, text="Port").grid(row=2, column=0)
-    ttk.Label(root, text="Password").grid(row=3, column=0)
+    # user label and entry
+    widgets.append(Label(screen, text="Username"))
+    widgets.append(Entry(screen, textvariable=user))
 
-    host_entry.focus()
+    # port label and entry
+    widgets.append(Label(screen, text="Port Number"))
+    widgets.append(Entry(screen, textvariable=port))
 
-    ttk.Button(root, text="Submit", command=lambda: entry(db.DBInfo(host.get(), user.get(), port.get(), passwd.get()))).grid(row=4, column=1)
+    # name label and entry
+    widgets.append(Label(screen, text="Database Name"))
+    widgets.append(Entry(screen, textvariable=name))
 
-# attempt to connect to the database using the info passed in
-# if successful, return the connection
-# if not, prompt the user for the database info again
-def test_entry(info: db.DBInfo):
+
+    # passwd label and entry
+    widgets.append(Label(screen, text="Password"))
+    widgets.append(Entry(screen, textvariable=passwd, show="*"))
+
+    # submit button
+    widgets.append(Button(screen, text="Submit Fields", width=10, height=1, bg="red", fg="white", command=(lambda: submit(host, user, port, passwd))))
+
+    # pack the widgets
+    for w in widgets:
+        w.pack()
+
+# attempt to connect to the server
+def submit(host, user, port, passwd):
+    global connection
+
+    host = host.get()
+    user = user.get()
+    port = port.get()
+    passwd = passwd.get()
+
     try:
-        database = sql.connect(
-            host=info.host,
-            user=info.user,
-            port=info.port,
-            passwd=info.passwd
+        connection = sql.connect(
+            host=host, user=user,
+            port=port, passwd=passwd,
+            auth_plugin="mysql_native_password"
         )
-        return database
+        perform_query()
     except sql.Error as e:
-        msg.showerror("Error", f"{e}")
+        showerror(title="Unable to Connect", message=e)
+
+# allows the user to put in some SQL code
+# and then see the result
+# essentially the main loop of the program
+def perform_query():
+    global screen
+    global widgets
+    global name
+
+    name = name.get()
+
+    screen.title("Grocery Store DB")
+
+    # clear the previous screen
+    for w in widgets:
+        w.destroy()
+
+    widgets.clear()
+
+    widgets.append(Label(screen, text="SQL Code")) 
+    widgets.append(Text(screen, height=10)) # to get this text, use widgets[1]
+    widgets.append(Button(screen, text="Run SQL Code", width=10, height=1, bg="blue", fg="white", command=(lambda: run_sql(widgets[1].get("1.0", END)))))
+    widgets.append(Label(screen, text="Output")) 
+
+    widgets.append(Text(screen, height=20)) # this is where the output should go - widgets[4]
+
+    for w in widgets:
+        w.pack()
+
+# run the given native SQL code
+def run_sql(code: str):
+    global connection
+    global widgets
+    global name
+    cursor = connection.cursor()
+    cursor.execute(f"USE {name}")
+    code = code.split(sep=";")
+    code = [command.strip() for command in code]
+    for command in code:
+        cursor.execute(command)
+    widgets[4].delete("1.0", "end")
+    for line in cursor:
+        widgets[4].insert(END, line)
+        widgets[4].insert(END, "\n")
+        print(line)
 
 def main():
-    root = setup_root("Grocery Store DB", 500)
-
-    # get database info then try to connect. 
-    info = get_db_info(root, test_entry)
-
-
-    run(root)
+    login_screen()
+    screen.mainloop()
 
 
 if __name__ == '__main__':
