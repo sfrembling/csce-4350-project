@@ -7,6 +7,7 @@ screen = Tk()    # screen where text is drawn
 connection: None # the active MySQL connection
 name: str        # the database name
 widgets = []     # maintains all the widgets
+cursor: None
 
 # the entry point where the user logs into the SQL server using their info
 def login_screen():
@@ -15,6 +16,7 @@ def login_screen():
     global name
     screen.geometry("600x600")
     screen.title("Login to MySQL Server")
+    screen.resizable(False, False)
 
     # holds the user's credentials
     host = StringVar()
@@ -55,6 +57,8 @@ def login_screen():
 # attempt to connect to the server
 def submit(host, user, port, passwd):
     global connection
+    global name
+    global cursor
 
     host = host.get()
     user = user.get()
@@ -67,6 +71,9 @@ def submit(host, user, port, passwd):
             port=port, passwd=passwd,
             auth_plugin="mysql_native_password"
         )
+        cursor = connection.cursor()
+        db_name = name.get()
+        cursor.execute(f"USE {db_name}")
         perform_query()
     except sql.Error as e:
         showerror(title="Unable to Connect", message=e)
@@ -77,9 +84,6 @@ def submit(host, user, port, passwd):
 def perform_query():
     global screen
     global widgets
-    global name
-
-    name = name.get()
 
     screen.title("Grocery Store DB")
 
@@ -104,8 +108,7 @@ def run_sql(code: str):
     global connection
     global widgets
     global name
-    cursor = connection.cursor()
-    cursor.execute(f"USE {name}")
+    global cursor
     code = code.split(sep=";")
     code = [command.strip() for command in code]
     for command in code:
