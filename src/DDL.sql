@@ -9,7 +9,7 @@ create table account (
 account_number numeric not null auto_increment,
 name varchar(30),
 primary key (account_number),
-foreign key (username) references login_information(username)
+foreign key (username) references login_information(username),
 foreign key (order_number) references order(order_number)
 )
 
@@ -28,12 +28,20 @@ information varchar(50),
 primary key (account_number) references account(account_number) on delete cascade
 )
 
+create table product (
+  product_ID numeric not null,
+  name varchar(30),
+  quantity numeric,
+  primary key (product_ID),
+  foreign key (shelf_number) references shelf(shelf_number)
+)
+
 create table order (
 order_number numeric not null auto_increment,
-products varchar(100),
+product_ID numeric not null,
 order_date varchar(30),
 primary key (order_number),
-foreign key (account_number) references account(account_number) on delete cascade
+foreign key (account_number) references account(account_number) on delete cascade,
 foreign key (product_ID) references product(product_ID) on delete cascade
 )
 
@@ -43,6 +51,6 @@ create table delivery_method (
 )
 
 create table order_history(
-  primary key (account_number) references account(account_number) on delete cascade
+  primary key (account_number) references account(account_number) on delete cascade,
   foreign key (order_number) references order(order_number)
 )
