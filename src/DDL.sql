@@ -1,14 +1,13 @@
-create table truck_driver
-	(Truck_ID		varchar(8),
-    Name			varchar(20) not null,
-    Product_ID		varchar(8),
-    quantity		numeric(10,0),
-    primary key (Truck_ID),
-    foreign key (Product_ID) references Supplier (Product_ID)
-		on delete cascade
+create table Warehouse 
+    (Warehouse_num		numeric(25,0),
+    Product_ID			varchar(8),
+    Quantity			numeric(10,0),
+	primary key (Warehouse_num),
+    foreign key (Product_ID, Quantity) references Product (Product_ID, Quantity)
+    	on delete cascade
     );
     
-    create table Supplier
+	create table Supplier
     (Supplier_ID		varchar(8),
     Name				varchar(20) not null,
     Product_ID			varchar(8),
@@ -17,13 +16,14 @@ create table truck_driver
     	on delete cascade
     );
     
-    create table Warehouse 
-    (Warehouse_num		numeric(25,0),
-    Product_ID			varchar(8),
-    Quantity			numeric(10,0),
-	primary key (Warehouse_num),
-    foreign key (Product_ID, Quantity) references Product (Product_ID, Quantity)
-    	on delete cascade
+    create table truck_driver
+	(Truck_ID		varchar(8),
+    Name			varchar(20) not null,
+    Product_ID		varchar(8),
+    quantity		numeric(10,0),
+    primary key (Truck_ID),
+    foreign key (Product_ID) references Supplier (Product_ID)
+		on delete cascade
     );
     
     create table Store
@@ -43,7 +43,8 @@ create table truck_driver
     (Shelf_ID			varchar(8),
     Catagory			Varchar(20),
     Product_ID			varchar(8),
-    primary key (shelf_ID)
+    primary key (shelf_ID),
+    foreign key (product_ID) references product (Product_ID)
     );
     
     create table Manager
