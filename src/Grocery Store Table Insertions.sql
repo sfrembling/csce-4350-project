@@ -224,3 +224,55 @@ VALUES('4', 'Condiments', '4')
 
 INSERT INTO shelf(shelf_id, catagory, product_id)
 VALUES('5', 'Condiments', '5')
+
+-- Insert values into manager
+INSERT INTO manager(manager_id, name, phoneNumber)
+VALUES('1', 'Coraline Dileep', '210-200-6964')
+
+INSERT INTO manager(manager_id, name, phoneNumber)
+VALUES('2', 'Bernhard Zeltzin', '940-444-2844')
+
+INSERT INTO manager(manager_id, name, phoneNumber)
+VALUES('3', 'Nikita Swapna', '713-897-1178')
+
+-- Insert into employee
+INSERT INTO employee(employee_id, name, phoneNumber)
+VALUES('10', 'Antiope Kieron', '713-981-0726')
+
+INSERT INTO employee(employee_id, name, phoneNumber)
+VALUES('15', 'Shad Clem', '432-245-6094')
+
+INSERT INTO employee(employee_id, name, phoneNumber)
+VALUES('20', 'Murphy Sage', '432-332-3837')
+
+INSERT INTO employee(employee_id, name, phoneNumber)
+VALUES('25', 'Rolph Bennie', '432-459-5683')
+
+INSERT INTO employee(employee_id, name, phoneNumber)
+VALUES('30', 'Jep Kelan', '469-327-9762')
+
+INSERT INTO employee(employee_id, name, phoneNumber)
+VALUES('35', 'Marty Albert', '817-429-0691')
+
+-- Insert into delivery driver
+INSERT INTO delivery_driver(driver_id, name, phoneNumber)
+VALUES('100', 'Jackson Lew', '830-998-4541')
+
+INSERT INTO delivery_driver(driver_id, name, phoneNumber)
+VALUES('120', 'Tel Peter', '903-997-4605')
+
+INSERT INTO delivery_driver(driver_id, name, phoneNumber)
+VALUES('140', 'Karsyn Eldon', '972-404-7494')
+
+-- Insert into company
+INSERT INTO company(company_id, name, location)
+VALUES('1', 'Shopstand', 'Dallas')
+
+INSERT INTO company(company_id, name, location)
+VALUES('2', 'Constore', 'San Antonio')
+
+INSERT INTO company(company_id, name, location)
+VALUES('3', 'hstore', 'Houston')
+
+
+
