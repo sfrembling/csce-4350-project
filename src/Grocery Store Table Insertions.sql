@@ -115,3 +115,112 @@ VALUES('5', 'Delivery', '99496')
 
 INSERT INTO delivery_method(delivery_id, type, order_number)
 VALUES('6', 'Pickup', '45121')
+
+-- Insert values into order history(assumes order history is the history of client orders)
+INSERT INTO order_history(history_id, account_number, order_number)
+VALUES('08224', '1', '51570')
+
+INSERT INTO order_history(history_id, account_number, order_number)
+VALUES('07839 ', '10', '92626')
+
+INSERT INTO order_history(history_id, account_number, order_number)
+VALUES('83624 ', '10', '45873')
+
+INSERT INTO order_history(history_id, account_number, order_number)
+VALUES('97028 ', '20', '43656')
+
+INSERT INTO order_history(history_id, account_number, order_number)
+VALUES('31614 ', '30', '99496')
+
+INSERT INTO order_history(history_id, account_number, order_number)
+VALUES('44748 ', '40', '45121')
+
+-- Insert values into warehouse(Does not allow duplicate warehouse_num)
+INSERT INTO warehouse(warehouse_num, product_id, quantity)
+VALUES('461', '1', '10249')
+
+INSERT INTO warehouse(warehouse_num, product_id, quantity)
+VALUES('773 ', '2', '87938 ')
+
+INSERT INTO warehouse(warehouse_num, product_id, quantity)
+VALUES('179  ', '3', '16290 ')
+
+INSERT INTO warehouse(warehouse_num, product_id, quantity)
+VALUES('613 ', '4', '30405 ')
+
+INSERT INTO warehouse(warehouse_num, product_id, quantity)
+VALUES('285  ', '5', '80961 ')
+
+-- Insert values into supplier
+INSERT INTO supplier(supplier_id, name, product_id)
+VALUES('6568', 'Lucero INC.', '1')
+
+INSERT INTO supplier(supplier_id, name, product_id)
+VALUES('4470', 'Balwinder LLC.', '2')
+
+INSERT INTO supplier(supplier_id, name, product_id)
+VALUES('4541', 'Caron INC.', '3')
+
+INSERT INTO supplier(supplier_id, name, product_id)
+VALUES('2876', 'Parminder INC.', '4')
+
+INSERT INTO supplier(supplier_id, name, product_id)
+VALUES('0559', 'Udo LLC.', '5')
+
+-- Insert values into truck driver
+INSERT INTO truck_driver(truck_id, name, product_id, quantity)
+VALUES('040', 'Rani Chizoba', '1', '3609')
+
+INSERT INTO truck_driver(truck_id, name, product_id, quantity)
+VALUES('722', 'Pip Vinh', '1', '8141')
+
+INSERT INTO truck_driver(truck_id, name, product_id, quantity)
+VALUES('381', 'Shi Mu', '1', '0776')
+
+INSERT INTO truck_driver(truck_id, name, product_id, quantity)
+VALUES('207', 'Kerry Lakshmi', '1', '4810')
+
+INSERT INTO truck_driver(truck_id, name, product_id, quantity)
+VALUES('273', 'Bilge İlkay', '1', '2933')
+
+-- Insert values into store
+INSERT INTO store(store_id, location)
+VALUES('643', 'San Antonio')
+
+INSERT INTO store(store_id, location)
+VALUES('435 ', 'Vidor')
+
+INSERT INTO store(store_id, location)
+VALUES('369', 'Birmingham')
+
+-- Insert into aisle
+INSERT INTO aisle(aisle_num, catagory, shelf_num)
+VALUES('1', 'pasta', '5')
+
+INSERT INTO aisle(aisle_num, catagory, shelf_num)
+VALUES('2', 'Condiments', '2')
+
+INSERT INTO aisle(aisle_num, catagory, shelf_num)
+VALUES('3', 'Condiments', '1')
+
+INSERT INTO aisle(aisle_num, catagory, shelf_num)
+VALUES('4', 'Condiments', '6')
+
+INSERT INTO aisle(aisle_num, catagory, shelf_num)
+VALUES('5', 'Health', '3')
+
+-- Insert values into shelf
+INSERT INTO shelf(shelf_id, catagory, product_id)
+VALUES('1', 'pasta', '1')
+
+INSERT INTO shelf(shelf_id, catagory, product_id)
+VALUES('2', 'Condiments', '2')
+
+INSERT INTO shelf(shelf_id, catagory, product_id)
+VALUES('3', 'Health', '3')
+
+INSERT INTO shelf(shelf_id, catagory, product_id)
+VALUES('4', 'Condiments', '4')
+
+INSERT INTO shelf(shelf_id, catagory, product_id)
+VALUES('5', 'Condiments', '5')
