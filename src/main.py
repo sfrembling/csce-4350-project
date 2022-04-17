@@ -137,11 +137,9 @@ class MainScreen:
             code = [command.strip() for command in code]
 
             cursor = self.connection.cursor()
-            print(code, self.db_name)
             cursor.execute(f"USE {self.db_name}")
 
             for command in code:
-                print(command)
                 cursor.execute(command)
 
             columns = tuple([column[0] for column in cursor.description])
