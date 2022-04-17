@@ -1,128 +1,173 @@
-from tkinter import *
-from tkinter.messagebox import showerror # import everything for GUI support
-import mysql.connector as sql
+import mysql.connector as sql            # SQL functionality
+import tkinter as tk                     # GUI toolbox
+from tkinter import ttk                  # 
+from tkinter.messagebox import showerror # for displaying errors
 
 
-screen = Tk()    # screen where text is drawn
-connection: None # the active MySQL connection
-name: str        # the database name
-widgets = []     # maintains all the widgets
-cursor: None
+# Allows user to login to the server using their information
+class LoginScreen:
+    # setup the login screen
+    def __init__(self, master: tk.Tk) -> None:
+        self.master = master
+        self.frame = tk.Frame(self.master)
 
-# the entry point where the user logs into the SQL server using their info
-def login_screen():
-    global screen
-    global widgets
-    global name
-    screen.geometry("600x600")
-    screen.title("Login to MySQL Server")
-    screen.resizable(False, False)
+        self.master.title("MySQL Login")
+        self.master.geometry("300x300")
+        self.master.resizable(False, False)
 
-    # holds the user's credentials
-    host = StringVar()
-    user = StringVar()
-    port = StringVar()
-    passwd = StringVar()
-    name = StringVar()
+        # login fields - username, passwd, host address, port number, database to use
+        self.username = tk.StringVar()
+        self.passwd   = tk.StringVar()
+        self.host     = tk.StringVar()
+        self.port     = tk.StringVar()
+        self.database = tk.StringVar()
 
-    # host label and entry
-    widgets.append(Label(screen, text="Host Address"))
-    widgets.append(Entry(screen, textvariable=host))
-    widgets[1].focus()
+        # label and entry fields
+        self.labels = {}
+        self.entries = {}
 
-    # user label and entry
-    widgets.append(Label(screen, text="Username"))
-    widgets.append(Entry(screen, textvariable=user))
+        self.labels["username"]  = tk.Label(self.frame, text="Username")
+        self.labels["passwd"]    = tk.Label(self.frame, text="Password")
+        self.labels["host"]      = tk.Label(self.frame, text="Host Address")
+        self.labels["port"]      = tk.Label(self.frame, text="Port Number")
+        self.labels["database"]  = tk.Label(self.frame, text="Database")
 
-    # port label and entry
-    widgets.append(Label(screen, text="Port Number"))
-    widgets.append(Entry(screen, textvariable=port))
-
-    # name label and entry
-    widgets.append(Label(screen, text="Database Name"))
-    widgets.append(Entry(screen, textvariable=name))
+        self.entries["username"] = tk.Entry(self.frame, textvariable=self.username)
+        self.entries["passwd"]   = tk.Entry(self.frame, textvariable=self.passwd, show="*")
+        self.entries["host"]     = tk.Entry(self.frame, textvariable=self.host)
+        self.entries["port"]     = tk.Entry(self.frame, textvariable=self.port)
+        self.entries["database"] = tk.Entry(self.frame, textvariable=self.database)
 
 
-    # passwd label and entry
-    widgets.append(Label(screen, text="Password"))
-    widgets.append(Entry(screen, textvariable=passwd, show="*"))
+        first = True 
+        for label in self.labels: # add all of the elements to the screen
+            self.labels[label].pack()
+            self.entries[label].pack()
+            if first: # place focus on the first entry
+                self.entries[label].focus()
+                first = False
+        
+        self.enter_button = tk.Button(self.frame, text="Login", bg="green", fg="white", 
+            command=(lambda: self.attempt_login()))
+        
+        self.enter_button.pack()
 
-    # submit button
-    widgets.append(Button(screen, text="Submit Fields", width=10, height=1, bg="red", fg="white", command=(lambda: submit(host, user, port, passwd))))
+        self.frame.pack()
+    
+    # attempt a login
+    def attempt_login(self) -> None:
+        try:
+            # pass sql all the information from the user
+            # first, test the connection
+            connection = sql.connect(
+                host=self.host.get(), user=self.username.get(),
+                port=int(self.port.get()), passwd=self.passwd.get(),
+                auth_plugin="mysql_native_password"
+            )
+            # next, test the database
+            connection.cursor().execute(f"USE {self.database.get()}")
 
-    # pack the widgets
-    for w in widgets:
-        w.pack()
+            # all good at this point, destroy current screen and launch app
+            self.frame.destroy()
+            self.main = MainScreen(self.master, connection, self.database.get())
+        except sql.Error as e:
+            showerror(title="Unable to Connect", message=e)
 
-# attempt to connect to the server
-def submit(host, user, port, passwd):
-    global connection
-    global name
-    global cursor
 
-    host = host.get()
-    user = user.get()
-    port = port.get()
-    passwd = passwd.get()
+# As the name suggests, main screen of the app after login
+# Lets the user input SQL code and see the results
+class MainScreen:
+    def __init__(self, master: tk.Tk, connection, db_name: str) -> None:
+        self.connection = connection
+        self.db_name = db_name
 
-    try:
-        connection = sql.connect(
-            host=host, user=user,
-            port=port, passwd=passwd,
-            auth_plugin="mysql_native_password"
-        )
-        cursor = connection.cursor()
-        db_name = name.get()
-        cursor.execute(f"USE {db_name}")
-        perform_query()
-    except sql.Error as e:
-        showerror(title="Unable to Connect", message=e)
+        self.master = master
+        self.frame = tk.Frame(self.master)
 
-# allows the user to put in some SQL code
-# and then see the result
-# essentially the main loop of the program
-def perform_query():
-    global screen
-    global widgets
+        self.master.title("Grocery Store DB")
+        self.master.geometry("700x700")
+        self.master.resizable(True, True)
 
-    screen.title("Grocery Store DB")
+        # Input text box
+        self.labels = dict()
+        self.entries = dict()
 
-    # clear the previous screen
-    for w in widgets:
-        w.destroy()
+        self.labels["sql_input"]  = tk.Label(self.frame, text="Input SQL Code")
 
-    widgets.clear()
+        self.entries["sql_input"] = tk.Text(self.frame, height=10, width=60)
 
-    widgets.append(Label(screen, text="SQL Code")) 
-    widgets.append(Text(screen, height=10)) # to get this text, use widgets[1]
-    widgets.append(Button(screen, text="Run SQL Code", width=10, height=1, bg="blue", fg="white", command=(lambda: run_sql(widgets[1].get("1.0", END)))))
-    widgets.append(Label(screen, text="Output")) 
+        first = True
+        for label in self.labels:
+            self.labels[label].pack()
+            self.entries[label].pack()
+            if first:
+                self.entries[label].focus()
+                first = False
+        
+        # run button
+        
+        self.enter_button = tk.Button(self.frame, text="Run Code", bg="cyan", fg="black",
+            command=(lambda: self.run_sql()))
+        
+        self.enter_button.pack()
 
-    widgets.append(Text(screen, height=20)) # this is where the output should go - widgets[4]
+        # logout button
 
-    for w in widgets:
-        w.pack()
+        self.logout_button = tk.Button(self.frame, text="Log Out", bg="red", fg="white",
+            command=(lambda: self.logout()))
 
-# run the given native SQL code
-def run_sql(code: str):
-    global connection
-    global widgets
-    global name
-    global cursor
-    code = code.split(sep=";")
-    code = [command.strip() for command in code]
-    for command in code:
-        cursor.execute(command)
-    widgets[4].delete("1.0", "end")
-    for line in cursor:
-        widgets[4].insert(END, line)
-        widgets[4].insert(END, "\n")
-        print(line)
+        self.logout_button.pack()
+
+        # tabular output
+
+        self.output = ttk.Treeview(self.frame, columns=('', '', ''), show='headings', selectmode="browse", height=20)
+        self.output.pack(side="left")
+
+        self.output_scroll = ttk.Scrollbar(self.frame, orient="vertical", command=self.output.yview)
+        self.output_scroll.pack(side="right", fill="y")
+        self.output.configure(yscrollcommand=self.output_scroll.set)
+
+        self.frame.pack()
+    
+    # runs the provided SQL code and shows output
+    def run_sql(self) -> None:
+        try:
+            code = self.entries["sql_input"].get("1.0", tk.END)
+            code = code.split(sep=";")
+            code = [command.strip() for command in code]
+
+            cursor = self.connection.cursor()
+            print(code, self.db_name)
+            cursor.execute(f"USE {self.db_name}")
+
+            for command in code:
+                print(command)
+                cursor.execute(command)
+
+            columns = tuple([column[0] for column in cursor.description])
+
+            self.output.destroy()
+            self.output = ttk.Treeview(self.frame, columns=columns, show='headings', selectmode="browse", height=20)
+            self.output.pack(side="left")
+
+            for heading in columns:
+                self.output.heading(heading, text=heading)
+            
+            for value in cursor:
+                self.output.insert('', tk.END, values=value)
+        except sql.Error as e:
+            showerror(title="Unable to Run", message=e)
+    
+    # Log the user out, return to login screen
+    def logout(self) -> None:
+        self.frame.destroy()
+        self.main = LoginScreen(self.master)
+
 
 def main():
-    login_screen()
-    screen.mainloop()
-
+    root = tk.Tk()
+    _ = LoginScreen(root)
+    root.mainloop()
 
 if __name__ == '__main__':
     main()
