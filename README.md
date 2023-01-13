@@ -10,7 +10,6 @@ py main.py
 ```
 
 ## Credits
-(Write down what you did next to your name)
 * Shea Frembling: Frontend GUI, connecting client to sql server
 * Demir Altay: Inputted data into the completed tables
 * Wesley Glover: Created half of the tables, filled out Project description and Er diagram reports
